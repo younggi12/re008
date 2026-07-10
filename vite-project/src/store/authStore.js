@@ -1,54 +1,72 @@
-import { create } from "zustand"
-import { signOutWithFirebase,
-         signInwithEamil,
-         signUpWithEmail,
-         subscribeAuthState
+import { create } from 'zustand'
+import {
+    signOutWithFirebase,
+    signInwithEamil,
+    signUpWithEmail,
+    subscribeAuthState,
 } from '../services/firebaseAuth'
 
 const mapUser = (user) => {
-    if(!user){
-        return null 
+    if (!user) {
+        return null
     }
 
     return {
-        uid : user.uid,
-        email : user.email
+        uid: user.uid,
+        email: user.email,
     }
 }
 
-const useAuthStore = create( (set) =>({
-    user:null,
-    initialized:false,
-    loading:false,
-    error:'',
+const useAuthStore = create((set) => ({
+    user: null,
+    initialized: false,
+    loading: false,
+    error: '',
 
-    // 로그인 실시간 상태 감지 
     listenAuthState: () => {
-        return  subscribeAuthState( (user) => {
+        return subscribeAuthState((user) => {
             set({
                 user: mapUser(user),
-                initialized:true,
+                initialized: true,
             })
         })
     },
 
+    signUp: async ({ email, password }) => {
+        set({ loading: true, error: '' })
 
-    // 회원가입
-    signUp: async ({email, password}) => {
-        set({loading : true, error:'' })
-        try{
-            const user = await signUpWithEmail({email,password})
-            set({ user : mapUser(user), loading : false })
-        }catch(err){
-            set( {error : err, loading : false } )
-            throw err 
+        try {
+            const user = await signUpWithEmail({ email, password })
+            set({ user: mapUser(user), loading: false })
+        } catch (err) {
+            set({ error: err.message, loading: false })
+            throw err
         }
     },
 
-    // 로그인
+    signIn: async ({ email, password }) => {
+        set({ loading: true, error: '' })
 
-    // 로그아웃
+        try {
+            const user = await signInwithEamil({ email, password })
+            set({ user: mapUser(user), loading: false })
+        } catch (err) {
+            set({ error: err.message, loading: false })
+            throw err
+        }
+    },
 
+    signOut: async () => {
+        set({ loading: true, error: '' })
+
+        try {
+            await signOutWithFirebase()
+            set({ user: null, loading: false })
+        } catch (err) {
+            set({ error: err.message, loading: false })
+            throw err
+        }
+    },
 }))
 
 export default useAuthStore
