@@ -1,8 +1,10 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import usePostStore from '../store/postStore'
 
 const PostList = () => {
+    const [keyword, setKeyword] = useState('')
+    const [sortMode, setSortMode] = useState('latest')
     const posts = usePostStore((state) => state.posts)
     const deletePost = usePostStore((state) => state.deletePost)
     const loading = usePostStore((state) => state.loading)
@@ -13,19 +15,69 @@ const PostList = () => {
         fetchPosts()
     }, [fetchPosts])
 
+    const visiblePosts = useMemo(() => {
+        const filteredPosts = posts.filter((post) => {
+            const searchText = `${post.title} ${post.writer} ${post.content}`.toLowerCase()
+            return searchText.includes(keyword.trim().toLowerCase())
+        })
+
+        return [...filteredPosts].sort((a, b) => {
+            const aTime = new Date(a.createdAt || 0).getTime()
+            const bTime = new Date(b.createdAt || 0).getTime()
+            return sortMode === 'latest' ? bTime - aTime : aTime - bTime
+        })
+    }, [keyword, posts, sortMode])
+
     return (
         <section className='post-list'>
             <div className='post-list__head'>
-                <h3>게시글 목록</h3>
-                <span>총 {posts.length}개</span>
+                <div>
+                    <span>Browse</span>
+                    <h3>게시글 목록</h3>
+                </div>
+                <p>총 {posts.length}개</p>
+            </div>
+
+            <div className='post-list__toolbar'>
+                <input
+                    type='search'
+                    placeholder='제목, 작성자, 내용 검색'
+                    value={keyword}
+                    onChange={(e) => {
+                        setKeyword(e.target.value)
+                    }}
+                />
+
+                <div className='post-list__sort'>
+                    <button
+                        type='button'
+                        className={sortMode === 'latest' ? 'is-active' : ''}
+                        onClick={() => {
+                            setSortMode('latest')
+                        }}
+                    >
+                        최신순
+                    </button>
+                    <button
+                        type='button'
+                        className={sortMode === 'oldest' ? 'is-active' : ''}
+                        onClick={() => {
+                            setSortMode('oldest')
+                        }}
+                    >
+                        오래된순
+                    </button>
+                </div>
             </div>
 
             {error && <p className='post-list__message'>{error}</p>}
             {loading && <p className='post-list__message'>불러오는 중입니다...</p>}
 
             {
-                posts.length === 0 ? (
-                    <div className='post-list__empty'>등록된 게시글이 없습니다</div>
+                visiblePosts.length === 0 ? (
+                    <div className='post-list__empty'>
+                        {keyword ? '검색 결과가 없습니다' : '등록된 게시글이 없습니다'}
+                    </div>
                 ) : (
                     <table>
                         <thead>
@@ -38,7 +90,7 @@ const PostList = () => {
                         </thead>
                         <tbody>
                             {
-                                posts.map((item, index) => {
+                                visiblePosts.map((item, index) => {
                                     return (
                                         <tr key={item.id}>
                                             <td>{index + 1}</td>

@@ -35,11 +35,20 @@ const PostForm = () => {
         }
     }
 
+    const submitByKeyboard = (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+            submitB()
+        }
+    }
+
     return (
         <div className='post-form'>
             <div className='post-form__head'>
-                <h3>새 글 작성</h3>
-                <span>{user ? user.email : '로그인이 필요합니다'}</span>
+                <div>
+                    <span>Compose</span>
+                    <h3>새 글 작성</h3>
+                </div>
+                <p>{user ? user.email : '로그인이 필요합니다'}</p>
             </div>
 
             <input
@@ -49,6 +58,7 @@ const PostForm = () => {
                 onChange={(e) => {
                     setTitle(e.target.value)
                 }}
+                onKeyDown={submitByKeyboard}
             />
 
             <textarea
@@ -57,11 +67,15 @@ const PostForm = () => {
                 onChange={(e) => {
                     setContent(e.target.value)
                 }}
+                onKeyDown={submitByKeyboard}
             />
 
-            <button onClick={submitB} disabled={loading}>
-                {loading ? '등록중...' : '등록'}
-            </button>
+            <div className='post-form__footer'>
+                <span>{content.length}자</span>
+                <button onClick={submitB} disabled={loading}>
+                    {loading ? '등록중...' : '등록'}
+                </button>
+            </div>
         </div>
     )
 }
