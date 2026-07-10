@@ -14,13 +14,18 @@ const PostList = () => {
     }, [fetchPosts])
 
     return (
-        <section>
-            <h3>게시글 목록</h3>
-            {error && <p>{error}</p>}
-            {loading && <p>불러오는 중입니다...</p>}
+        <section className='post-list'>
+            <div className='post-list__head'>
+                <h3>게시글 목록</h3>
+                <span>총 {posts.length}개</span>
+            </div>
+
+            {error && <p className='post-list__message'>{error}</p>}
+            {loading && <p className='post-list__message'>불러오는 중입니다...</p>}
+
             {
                 posts.length === 0 ? (
-                    <h3>등록된 게시글이 없습니다</h3>
+                    <div className='post-list__empty'>등록된 게시글이 없습니다</div>
                 ) : (
                     <table>
                         <thead>
@@ -28,7 +33,7 @@ const PostList = () => {
                                 <th>번호</th>
                                 <th>제목</th>
                                 <th>작성자</th>
-                                <th>비고</th>
+                                <th>관리</th>
                             </tr>
                         </thead>
                         <tbody>

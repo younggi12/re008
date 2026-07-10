@@ -36,22 +36,23 @@ const PostForm = () => {
     }
 
     return (
-        <div>
-            <h3>글쓰기</h3>
+        <div className='post-form'>
+            <div className='post-form__head'>
+                <h3>새 글 작성</h3>
+                <span>{user ? user.email : '로그인이 필요합니다'}</span>
+            </div>
 
             <input
                 type='text'
-                placeholder='제목 입력'
+                placeholder='제목을 입력하세요'
                 value={title}
                 onChange={(e) => {
                     setTitle(e.target.value)
                 }}
             />
 
-            <input type='text' value={user?.email || ''} readOnly />
-
             <textarea
-                placeholder='글 내용 입력'
+                placeholder='내용을 입력하세요'
                 value={content}
                 onChange={(e) => {
                     setContent(e.target.value)
@@ -59,7 +60,7 @@ const PostForm = () => {
             />
 
             <button onClick={submitB} disabled={loading}>
-                {loading ? '등록중입니다...' : '등록'}
+                {loading ? '등록중...' : '등록'}
             </button>
         </div>
     )
