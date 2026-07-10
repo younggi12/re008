@@ -1,20 +1,36 @@
-import React, { useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import React, { useEffect, useState } from 'react'
+import { Link, useLocation } from 'react-router-dom'
 import usePostStore from '../store/postStore'
 
 const Detail = () => {
-    const { id } = useParams()
+    const location = useLocation()
+    const id = location.state?.id
     const posts = usePostStore((state) => state.posts)
     const updatePost = usePostStore((state) => state.updatePost)
+    const fetchPosts = usePostStore((state) => state.fetchPosts)
+
+    useEffect(() => {
+        if (posts.length === 0) {
+            fetchPosts()
+        }
+    }, [fetchPosts, posts.length])
 
     const post = posts.find((item) => {
         return item.id === id
     })
 
     const [isEdit, setIsEdit] = useState(false)
-    const [title, setTitle] = useState(post ? post.title : '')
-    const [writer, setWriter] = useState(post ? post.writer : '')
-    const [content, setContent] = useState(post ? post.content : '')
+    const [title, setTitle] = useState('')
+    const [writer, setWriter] = useState('')
+    const [content, setContent] = useState('')
+
+    useEffect(() => {
+        if (post) {
+            setTitle(post.title)
+            setWriter(post.writer)
+            setContent(post.content)
+        }
+    }, [post])
 
     const updatefunc = async () => {
         if (title.trim() === '' || writer.trim() === '' || content.trim() === '') {
@@ -36,10 +52,19 @@ const Detail = () => {
         }
     }
 
+    if (!id) {
+        return (
+            <div>
+                <h2>게시글을 선택해주세요</h2>
+                <Link to='/'>목록으로</Link>
+            </div>
+        )
+    }
+
     if (!post) {
         return (
             <div>
-                <h2>게시글이 없습니다</h2>
+                <h2>게시글을 불러오는 중입니다</h2>
                 <Link to='/'>목록으로</Link>
             </div>
         )
@@ -52,7 +77,6 @@ const Detail = () => {
             {
                 isEdit ? (
                     <>
-                        <p><strong>번호 : </strong>{post.id}</p>
                         <input
                             type='text'
                             value={title}
@@ -89,7 +113,6 @@ const Detail = () => {
                     </>
                 ) : (
                     <>
-                        <p><strong>번호</strong> : {post.id}</p>
                         <p><strong>제목</strong> : {post.title}</p>
                         <p><strong>작성자</strong> : {post.writer}</p>
                         <p><strong>내용</strong></p>

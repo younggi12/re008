@@ -38,7 +38,7 @@ const App = () => {
       <section className='app__content'>
         <Routes>
           <Route path='/' element={<Board />} />
-          <Route path='/detail/:id' element={<Detail />} />
+          <Route path='/detail' element={<Detail />} />
         </Routes>
       </section>
     </div>

@@ -33,15 +33,23 @@ const PostList = () => {
                         </thead>
                         <tbody>
                             {
-                                posts.map((item) => {
+                                posts.map((item, index) => {
                                     return (
                                         <tr key={item.id}>
-                                            <td>{item.id}</td>
-                                            <td><Link to={`/detail/${item.id}`}>{item.title}</Link></td>
+                                            <td>{index + 1}</td>
+                                            <td>
+                                                <Link to='/detail' state={{ id: item.id }}>
+                                                    {item.title}
+                                                </Link>
+                                            </td>
                                             <td>{item.writer}</td>
                                             <td>
-                                                <Link to={`/detail/${item.id}`}>수정</Link>
-                                                <button onClick={() => { deletePost(item.id) }}>삭제</button>
+                                                <Link to='/detail' state={{ id: item.id }}>
+                                                    수정
+                                                </Link>
+                                                <button onClick={() => { deletePost(item.id) }}>
+                                                    삭제
+                                                </button>
                                             </td>
                                         </tr>
                                     )
